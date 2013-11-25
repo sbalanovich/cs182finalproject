@@ -2,64 +2,10 @@ CS 182 Final Project 2013
 =================
 Collaborators: Serguei Balanovich, Peter Bang, Chris Smiles
 
-The use of crowdsourcing ­ capitalizing a large network of (usually anonymous) people to
+The use of crowdsourcing - capitalizing a large network of (usually anonymous) people to complete a set of tasks - has grown increasingly popular in recent years. Marketplaces like Amazon Mechanical Turk have made crowdsourcing a practical solution to all sorts of problems, and as a result have seen substantial usage in everything from commercial ventures to academic research. These marketplaces connect two different parties - “requesters,” who have tasks they need completed, and “workers,” who are usually offered financial incentives to complete said tasks - but how these connections are initiated varies from platform to platform.
 
-complete a set of tasks ­ has grown increasingly popular in recent years. Marketplaces like
+A common paradigm is simply to allow requesters to add their tasks to a public pool, from which any worker can select an assignment to complete. In some cases, requesters are allowed to add certain stipulations; for example, they might be allowed to specify that a task can only be picked up by workers who have a minimum percentage of their previous tasks approved. Domain-specific marketplaces often allow for more robust constraints, allowing requesters to stipulate that their tasks only be completed by workers with particular skills, quality ratings, etc. These constraints benefit the requester by improving the workers’ responses to the task.
 
-Amazon Mechanical Turk have made crowdsourcing a practical solution to all sorts of problems,
+Unfortunately, most general crowdsourcing marketplaces offer limited constraint options. Mechanical Turk allows requesters to create certain “qualifications,” which workers can obtain by meeting certain requirements or passing a test. (Some of these are assigned to workers automatically by the marketplace; for example, if a worker achieves a certain approval percentage.) Still, creating these qualifications can be time-consuming for requesters, especially if they have several types of tasks they need completed, each requiring a different skill (i.e. a separate qualification). 
 
-and as a result have seen substantial usage in everything from commercial ventures to
-
-academic research. These marketplaces connect two different parties ­ “requesters,” who have
-
-tasks they need completed, and “workers,” who are usually offered financial incentives to
-
-complete said tasks ­ but how these connections are initiated varies from platform to platform.
-
-A common paradigm is simply to allow requesters to add their tasks to a public pool, from which
-
-any worker can select an assignment to complete. In some cases, requesters are allowed to
-
-add certain stipulations; for example, they might be allowed to specify that a task can only be
-
-picked up by workers who have a minimum percentage of their previous tasks approved.
-
-Domain­specific marketplaces often allow for more robust constraints, allowing requesters to
-
-stipulate that their tasks only be completed by workers with particular skills, quality ratings, etc.
-
-These constraints benefit the requester by improving the workers’ responses to the task.
-
-Unfortunately, most general crowdsourcing marketplaces offer limited constraint options.
-
-Mechanical Turk allows requesters to create certain “qualifications,” which workers can obtain by
-
-meeting certain requirements or passing a test. (Some of these are assigned to workers
-
-automatically by the marketplace; for example, if a worker achieves a certain approval
-
-percentage.) Still, creating these qualifications can be time­consuming for requesters, especially
-
-if they have several types of tasks they need completed, each requiring a different skill (i.e. a
-
-separate qualification).
-
-Consider the leader of an organization who needs several tasks completed, and needs to assign
-
-those tasks to the members of said organization. The ideal mechanism would allow the leader to
-
-specify constraints and preferences that, in addition to ensuring the assignments are completed
-
-(and completed efficiently), also make use of the leader’s knowledge about the members’ skills
-
-and other attributes. The focus of our project is to create a system that would allow the requester
-
-to easily include a robust set of constraints, some of which are strict and absolutely may not be
-
-violated in the final solution, and some of which are loose and merely indicate the cost to the
-
-collective utility of the group. The goal of our local search algorithms will be to find an assignment
-
-of organization members to various tasks that obeys all the strict constraints while minimizing
-
-the cost to the collective utility of the group.
+Consider the leader of an organization who needs several tasks completed, and needs to assign those tasks to the members of said organization. The ideal mechanism would allow the leader to specify constraints and preferences that, in addition to ensuring the assignments are completed (and completed efficiently), also make use of the leader’s knowledge about the members’ skills and other attributes. The focus of our project is to create a system that would allow the requester to easily include a robust set of constraints, some of which are strict and absolutely may not be violated in the final solution, and some of which are loose and merely indicate the cost to the collective utility of the group. The goal of our local search algorithms will be to find an assignment of organization members to various tasks that obeys all the strict constraints while minimizing the cost to the collective utility of the group
