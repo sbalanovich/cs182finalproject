@@ -1,4 +1,4 @@
-# task class
+# worker class
 class Worker:
     
     # constructor
