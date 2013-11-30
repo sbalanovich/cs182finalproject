@@ -14,7 +14,7 @@ with open("workers.csv", "wb") as workersFile:
 
 	writer.writerow(firstrow)
 
-	for e in xrange(100):
+	for e in xrange(10):
 		row = []
 		name = names.get_full_name()
 		row.append(name)
@@ -29,7 +29,7 @@ with open("tasks.csv", "wb") as tasksFile:
 
 	writer.writerow(firstrow)
 
-	for task in xrange(100):
+	for task in xrange(10):
 		row = []
 		row.append(task)
 		for i in xrange(4):
