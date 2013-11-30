@@ -5,16 +5,14 @@ import csv
 import names
 import random
 
-output = open("test.csv", "wb")
-writer = csv.writer(output)
+with open("test.csv", "wb") as outputfile:
+	writer = csv.writer(outputfile)
+	writer.writerow(["Name", "Computer", "Sorting", "Counting", "Making Coffee"])
 
-writer.writerow(["Name", "Computer", "Sorting", "Counting", "Making Coffee"])
-
-for e in xrange(100):
-	row = []
-	name = names.get_full_name()
-	row.append(name)
-	for i in xrange(4):
-		row.append(random.choice(["T","F"]))
-	writer.writerow(row)
-output.close()
+	for e in xrange(100):
+		row = []
+		name = names.get_full_name()
+		row.append(name)
+		for i in xrange(4):
+			row.append(random.choice(["T","F"]))
+		writer.writerow(row)

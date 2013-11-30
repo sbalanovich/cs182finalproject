@@ -2,6 +2,7 @@ import sys
 import worker
 import task
 import local
+import csv
 
 if __name__ == '__main__':
     # initialize workers
