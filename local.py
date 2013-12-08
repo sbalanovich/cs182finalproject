@@ -98,7 +98,7 @@ def find_random_neighbor(assignment, domain, constraints_dict):
 # hill climbing
 def hill_climbing(domain, constraints_dict):
     assignment = init_assignment(domain)
-    best_cost = float("inf")
+    best_cost = evaluation_func(assignment, domain, constraints_dict)
     best_neighbor, neighbor_cost = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
     while(neighbor_cost < best_cost):
         assignment = best_neighbor
@@ -148,5 +148,21 @@ def stoc_hill_climbing(domain, constraints_dict):
         print "cost", curr_cost
     print "FINAL COST", curr_cost
     return assignment
-    
-    
+
+# simulated annealing
+def simulated_annealing(domain, constraints_dict):
+    assignment = init_assignment(domain)
+    energy = evaluation_func(assignment, domain, constraints_dict)
+    best_result = (assignment, energy)
+    k = 0
+    kMax = 200
+    eMin = float("inf")
+    while (k > kmax and energy < eMin):
+        temp = temperature(k/kMax)
+        rand_neighbor, new_cost = find_random_neighbor(assignment, domain, constraints_dict)
+        if P(shit) > random.random():
+            assignment = rand_neighbor
+        if new_cost < best_result[1]:
+            best_result = (rand_neighbor, new_cost)
+        k += 1
+    return assignment
