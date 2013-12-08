@@ -5,6 +5,9 @@ import csv
 import names
 import random
 
+NUM_WORKERS = 10
+NUM_TASKS = 5
+
 skillList = ["Computer", "Sorting", "Counting", "Making Coffee"]
 
 with open("workers.csv", "wb") as workersFile:
@@ -14,7 +17,7 @@ with open("workers.csv", "wb") as workersFile:
 
 	writer.writerow(firstrow)
 
-	for e in xrange(100):
+	for e in xrange(NUM_WORKERS):
 		row = []
 		name = names.get_full_name()
 		row.append(name)
@@ -29,7 +32,7 @@ with open("tasks.csv", "wb") as tasksFile:
 
 	writer.writerow(firstrow)
 
-	for task in xrange(20):
+	for task in xrange(NUM_TASKS):
 		row = []
 		row.append(task)
 		for i in xrange(4):

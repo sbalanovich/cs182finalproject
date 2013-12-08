@@ -166,7 +166,7 @@ def temperature(k):
         raise("Invalid TEMP_FUNCTION")
 
 def p_move(new_cost, cost, temp):
-    return e**(cost-new_cost)/temp
+    return e**((new_cost-cost)/temp)
 
 # simulated annealing
 def simulated_annealing(domain, constraints_dict):
@@ -182,10 +182,29 @@ def simulated_annealing(domain, constraints_dict):
         if temp < MIN_TEMP:
             return best_assignment
         rand_neighbor, new_cost = find_random_neighbor(assignment, domain, constraints_dict)
-        if new_cost < cost or p_move(new_cost, cost, temp) > random.random():
+        if new_cost < cost or p_move(new_cost, cost, temp) < random.random():
             assignment = rand_neighbor
             cost = new_cost
             if cost < lowest_cost:
                 best_assignment = assignment
                 lowest_cost = cost
         k += 1
+
+def stoch2(domain, constraints_dict):
+    assignment = init_assignment(domain)
+    cost = evaluation_func(assignment, domain, constraints_dict)
+    best_assignment, lowest_cost = assignment, cost
+    # SET MAX ITERATIONS HERE
+    max_iters = 6905
+    for i in xrange(max_iters):
+        print i
+        print "cost", cost
+        print "lowest_cost", lowest_cost
+        rand_neighbor, new_cost = find_random_neighbor(assignment, domain, constraints_dict)
+        if new_cost < cost and e**(new_cost-cost) < random.random():
+            assignment = rand_neighbor
+            cost = new_cost
+            if cost < lowest_cost:
+                best_assignment = assignment 
+                lowest_cost = cost
+    return best_assignment
