@@ -36,8 +36,8 @@ if __name__ == '__main__':
     # constraints_dict
     constraints_dict = {
         'skill_constraint' : (True, 1),
-        'all_assigned_constraint' : (True, 1),
-        'assigned_once_constraint' : (True, 1)
+        'all_assigned_constraint' : (True, float("inf")),
+        'assigned_once_constraint' : (True, 5)
     }
 
     # get algorithm name argument
