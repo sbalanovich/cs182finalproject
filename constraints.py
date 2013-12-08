@@ -1,4 +1,3 @@
-
 def skill_constraint(assignment, domain, cost):
     workers, tasks = domain
     total_cost = 0
@@ -26,3 +25,31 @@ def assigned_once_constraint(assignment, domain, cost):
         if assigned_tasks.count(task) > 1:
             total_cost += cost
     return total_cost
+
+def efficiency_constraint(assignment, domain, cost):
+    workers, tasks = domain
+    total_cost = 0
+    for worker in assignment.keys():
+        numeffs = len(workers[worker].effs)
+        for task in workers[worker].effs.keys():
+            inv_eff = numeffs-workers[worker].effs[task]
+            totalcost += cost*inv_eff
+    return total_cost
+
+def preference_constraint(assignment, domain, cost):
+    workers, tasks = domain
+    total_cost = 0
+    for worker in assignment.keys():
+        numprefs = len(workers[worker].prefs)
+        for task in workers[worker].prefs.keys():
+            inv_pref = numprefs-workers[worker].prefs[task]
+            totalcost += cost*inv_pref
+    return total_cost
+
+def time_constraint(assignment, domain, cost):
+    raise("Not Defined")
+
+def labor_cost_constraint(assignment, domain, cost):
+    raise("Not Defined")
+    
+
