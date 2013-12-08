@@ -1,6 +1,7 @@
 import copy
 import random
 import constraints
+from math import log, e
 
 # constraints_dict is dict where keys are constraint function names
 # and values are (boolean, int) tuples representing (enabled, cost)
@@ -69,9 +70,9 @@ def find_random_neighbor(assignment, domain, constraints_dict):
     worker = random.choice(workers.values())
     task = random.choice(tasks.values())
     if task.name in assignment[worker.name]:
-        new_assignment[worker].remove(task.name)
+        new_assignment[worker.name].remove(task.name)
     else:
-        new_assignment[worker].append(task.name)
+        new_assignment[worker.name].append(task.name)
     cost = evaluation_func(new_assignment, domain, constraints_dict)
     return (new_assignment, cost)
 
@@ -108,24 +109,46 @@ def rr_hill_climbing(domain, constraints_dict):
             best_result = (best_neighbor, neighbor_cost)
     print "FINAL COST", best_result[1]
     return best_result[0]
-    
+
+# GLOBALS
+TEMP_FUNCTION = 0 # 0 for exp, 1 for fast, 2 for boltz
+INIT_TEMP = 1000
+MIN_TEMP = 1
+
 # stochastic hill climbing
 # def stoc_hill_climbing(domain, constraints_dict):
+
+def temperature(k):
+    if TEMP_FUNCTION == 0: # exponential
+        return INIT_TEMP * 0.999**k
+    elif TEMP_FUNCTION == 1: # fast
+        return INIT_TEMP / k
+    elif TEMP_FUNCTION == 2: # boltz
+        return INIT_TEMP / log(k)
+    else:
+        raise("Invalid TEMP_FUNCTION")
+
+def p_move(new_cost, cost, temp):
+    return e**(cost-new_cost)/temp
 
 # simulated annealing
 def simulated_annealing(domain, constraints_dict):
     assignment = init_assignment(domain)
-    energy = evaluation_func(assignment, domain, constraints_dict)
-    best_result = (assignment, energy)
-    k = 0
-    kMax = 200
-    eMin = float("inf")
-    while (k > kmax and energy < eMin):
-        temp = temperature(k/kMax)
+    cost = evaluation_func(assignment, domain, constraints_dict)
+    best_assignment, lowest_cost = assignment, cost
+    k = 2
+    while True:
+        print k
+        print "cost", cost
+        print "lowest_cost", lowest_cost
+        temp = temperature(k)
+        if temp < MIN_TEMP:
+            return best_assignment
         rand_neighbor, new_cost = find_random_neighbor(assignment, domain, constraints_dict)
-        if P(shit) > random.random():
+        if p_move(new_cost, cost, temp) > random.random():
             assignment = rand_neighbor
-        if new_cost < best_result[1]:
-            best_result = (rand_neighbor, new_cost)
+            cost = new_cost
+            if cost < lowest_cost:
+                best_assignment = assignment
+                lowest_cost = cost
         k += 1
-    return assignment
