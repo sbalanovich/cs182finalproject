@@ -212,7 +212,19 @@ def rand_stoch_hill_climbing(domain, constraints_dict):
                 best_assignment = assignment 
                 lowest_cost = cost
     return best_assignment
-
+'''
+A cross between Beam Search and Local Search. Normally used to maximize an objective function.
+The algorithm holds 'k' number of states at any given time. Initially these k states are
+randomly generated. The successors of these k states are calculated using the objective function.
+If any of these successors is a 'goal', that is, the maximum value of the objective function,
+then the algorithm halts. Otherwise the initial k states and k number of successors are placed in a pool.
+This pool has a total of 2k states. The pool is numerically sorted and the best (highest) k states
+are selected as new initial states. This process repeats until a maximum value is reached.
+This algorithm is particularity effective at quickly abandoning 'dead end' searches, so maximum
+resources can be used on the promising successors. However when using the Local Beam Searching
+algorithm, the k states can easily become concentrated over a very small amount of state space.
+This leads to the algorithm being nothing more than a more resource intensive Hill Climbing algorithm.
+'''
 def beam_search(domain, constraints_dict, k=10):
     initial_assignments = [init_assignment(domain) for i in range(k)]
     min_k = initial_assignments
