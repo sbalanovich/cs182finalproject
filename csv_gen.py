@@ -14,6 +14,7 @@ with open("workers.csv", "wb") as workersFile:
 	writer = csv.writer(workersFile)
 	firstrow = ["Name"]
 	firstrow.extend(skillList)
+	firstrow.append("Number of tasks")
 
 	writer.writerow(firstrow)
 
@@ -23,6 +24,8 @@ with open("workers.csv", "wb") as workersFile:
 		row.append(name)
 		for i in xrange(4):
 			row.append(random.choice(["T","F"]))
+		num_tasks = int(random.random() * NUM_TASKS / 10 + 1)
+		row.append(num_tasks)
 		writer.writerow(row)
 
 with open("tasks.csv", "wb") as tasksFile:

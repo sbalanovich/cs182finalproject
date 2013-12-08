@@ -18,7 +18,8 @@ def too_many_workers(assignment, domain, cost):
             for task2 in assignment[worker]:
                 if task == task2:
                     assigned += 1
-        total_cost += (assigned - wanted) * cost
+        if assigned > wanted:
+            total_cost += (assigned - wanted) * cost
     return total_cost
 
 def too_few_workers(assignment, domain, cost):
@@ -31,7 +32,28 @@ def too_few_workers(assignment, domain, cost):
             for task2 in assignment[worker]:
                 if task == task2:
                     assigned += 1
-        total_cost += (wanted - assigned) * cost
+        if assigned < wanted:
+            total_cost += (wanted - assigned) * cost
+    return total_cost
+
+def too_many_tasks(assignment, domain, cost):
+    workers, tasks = domain
+    total_cost = 0
+    for worker in workers.values():
+        wanted = int(worker.num_tasks)
+        assigned = len(assignment[worker.name])
+        if assigned > wanted:
+            total_cost += (assigned - wanted) * cost
+    return total_cost
+
+def too_few_tasks(assignment, domain, cost):
+    workers, tasks = domain
+    total_cost = 0
+    for worker in workers.values():
+        wanted = int(worker.num_tasks)
+        assigned = len(assignment[worker.name])
+        if assigned < wanted:
+            total_cost += (wanted - assigned) * cost
     return total_cost
 
  
