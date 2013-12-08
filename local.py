@@ -2,6 +2,7 @@ import copy
 import random
 import constraints
 from math import log, e
+import numpy as np
 
 # constraints_dict is dict where keys are constraint function names
 # and values are (boolean, int) tuples representing (enabled, cost)
@@ -36,6 +37,21 @@ def init_assignment(domain):
 
 # neighbors of the current assignment are generated in one of two ways:
 # either remove one of a worker's assigned tasks or assign the worker a new task
+
+def find_all_neighbors(assignment, domain, constraints_dict):
+    workers, tasks = domain
+    neighbors = []
+    for worker in assignment.keys():
+        for task in tasks.values():
+            new_assignment = copy.deepcopy(assignment)
+            if task.name in assignment[worker]:
+                new_assignment[worker].remove(task.name)
+                cost = evaluation_func(new_assignment, domain, constraints_dict)
+            else:
+                new_assignment[worker].append(task.name)
+                cost = evaluation_func(new_assignment, domain, constraints_dict)
+            neighbors.append((new_assignment, cost))
+    return neighbors
 
 # we evaluate all neighbors of the current assignment
 # and then we return the "best" neighbor (with the lowest cost)
@@ -89,7 +105,7 @@ def hill_climbing(domain, constraints_dict):
         assignment = best_neighbor
         best_cost = neighbor_cost
         best_neighbor, neighbor_cost = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
-        print k
+        print "cost", best_cost
     print "FINAL COST", neighbor_cost
     return best_neighbor
 
@@ -117,7 +133,27 @@ INIT_TEMP = 1000
 MIN_TEMP = 1
 
 # stochastic hill climbing
-# def stoc_hill_climbing(domain, constraints_dict):
+def stoc_hill_climbing(domain, constraints_dict):
+    # SET MAX ITERATIONS HERE
+    max_iters = 50
+    assignment = init_assignment(domain)
+    curr_cost = evaluation_func(assignment, domain, constraints_dict)
+    for i in xrange(max_iters):
+        neighbors = find_all_neighbors(assignment, domain, constraints_dict)
+        diffs = map(lambda x: curr_cost - x[1], neighbors)
+        diffs = map(lambda x: 0 if x < 0 else x, diffs)
+        diff_sum = float(sum(diffs))
+        if diff_sum == 0.0: # local maximum
+            print "FINAL COST", curr_cost
+            return assignment
+        else:
+            probs = map(lambda x: x / diff_sum, diffs)
+            idx = list(np.random.multinomial(1, probs, 1)[0]).index(1)
+            assignment = neighbors[idx][0]
+            curr_cost = neighbors[idx][1]
+        print "cost", curr_cost
+    print "FINAL COST", curr_cost
+    return assignment
 
 def temperature(k):
     if TEMP_FUNCTION == 0: # exponential
