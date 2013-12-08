@@ -157,7 +157,7 @@ def stoc_hill_climbing(domain, constraints_dict):
 
 def temperature(k):
     if TEMP_FUNCTION == 0: # exponential
-        return INIT_TEMP * 0.999**k
+        return INIT_TEMP * 0.9995**k
     elif TEMP_FUNCTION == 1: # fast
         return INIT_TEMP / k
     elif TEMP_FUNCTION == 2: # boltz
@@ -195,7 +195,7 @@ def stoch2(domain, constraints_dict):
     cost = evaluation_func(assignment, domain, constraints_dict)
     best_assignment, lowest_cost = assignment, cost
     # SET MAX ITERATIONS HERE
-    max_iters = 6905
+    max_iters = 50000
     for i in xrange(max_iters):
         print i
         print "cost", cost

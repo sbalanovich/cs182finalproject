@@ -1,6 +1,21 @@
-Task,Computer,Sorting,Counting,Making Coffee
-0,T,T,F,F
-1,T,F,T,T
-2,T,T,T,F
-3,T,T,T,T
-4,F,T,T,T
+Task,Computer,Sorting,Counting,Making Coffee,Number of workers
+0,F,T,T,F,7
+1,F,T,T,T,4
+2,T,F,F,F,8
+3,F,F,F,F,5
+4,F,T,T,T,4
+5,T,F,F,F,10
+6,T,T,T,F,10
+7,T,T,T,T,7
+8,F,T,F,F,3
+9,T,T,T,F,3
+10,T,T,F,F,8
+11,F,T,F,F,3
+12,F,T,T,F,2
+13,F,T,F,F,4
+14,T,F,T,T,9
+15,F,F,F,F,7
+16,T,F,T,T,1
+17,T,T,T,F,8
+18,T,T,F,T,6
+19,F,F,T,T,10
