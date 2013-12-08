@@ -25,9 +25,12 @@ def init_assignment(domain):
     workers, tasks = domain
     assignment = {}
     flipped_asst = {}
-    for task in tasks:
-        n = 1 + int(random.random() * (len(workers) - 1))
-        assignment[task] = random.sample(workers, n)
+    for task in tasks.values():
+        n = task.num_workers
+        if n > len(workers):
+            assignment[task.name] = workers
+        else:
+            assignment[task.name] = random.sample(workers, n)
     for worker in workers.keys():
         flipped_asst[worker] = []
     for task in assignment.keys():
@@ -42,6 +45,7 @@ def find_all_neighbors(assignment, domain, constraints_dict):
     workers, tasks = domain
     neighbors = []
     for worker in assignment.keys():
+        print worker
         for task in tasks.values():
             new_assignment = copy.deepcopy(assignment)
             if task.name in assignment[worker]:
@@ -190,12 +194,12 @@ def simulated_annealing(domain, constraints_dict):
                 lowest_cost = cost
         k += 1
 
-def stoch2(domain, constraints_dict):
+def rand_stoch_hill_climbing(domain, constraints_dict):
     assignment = init_assignment(domain)
     cost = evaluation_func(assignment, domain, constraints_dict)
     best_assignment, lowest_cost = assignment, cost
     # SET MAX ITERATIONS HERE
-    max_iters = 50000
+    max_iters = 30000
     for i in xrange(max_iters):
         print i
         print "cost", cost
@@ -208,3 +212,28 @@ def stoch2(domain, constraints_dict):
                 best_assignment = assignment 
                 lowest_cost = cost
     return best_assignment
+
+def beam_search(domain, constraints_dict, k=10):
+    initial_assignments = [init_assignment(domain) for i in range(k)]
+    min_k = initial_assignments
+    successors = []
+    scores = []
+    max_iters = 30000
+    for i in xrange(max_iters):
+        for asst in min_k:
+            neighbors = find_all_neighbors(asst, domain, constraints_dict)
+            print neighbors
+            successors.append(neighbors)
+        successors = [item for sublist in successors for item in sublist]
+        for asst in (successors + initial_assignments):
+            score = evaluation_func(asst, domain, constraints_dict)
+            if score == 0:
+                return asst
+            scores.append(score, asst)
+        min_k = scores.sort()[k:]
+        print min_k
+    
+        
+        
+    
+    
