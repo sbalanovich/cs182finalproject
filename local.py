@@ -89,6 +89,7 @@ def hill_climbing(domain, constraints_dict):
         assignment = best_neighbor
         best_cost = neighbor_cost
         best_neighbor, neighbor_cost = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
+        print k
     print "FINAL COST", neighbor_cost
     return best_neighbor
 
@@ -136,7 +137,7 @@ def simulated_annealing(domain, constraints_dict):
     assignment = init_assignment(domain)
     cost = evaluation_func(assignment, domain, constraints_dict)
     best_assignment, lowest_cost = assignment, cost
-    k = 2
+    k = 0
     while True:
         print k
         print "cost", cost
@@ -145,7 +146,7 @@ def simulated_annealing(domain, constraints_dict):
         if temp < MIN_TEMP:
             return best_assignment
         rand_neighbor, new_cost = find_random_neighbor(assignment, domain, constraints_dict)
-        if p_move(new_cost, cost, temp) > random.random():
+        if new_cost < cost or p_move(new_cost, cost, temp) > random.random():
             assignment = rand_neighbor
             cost = new_cost
             if cost < lowest_cost:
