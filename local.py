@@ -190,12 +190,13 @@ def simulated_annealing(domain, constraints_dict):
                 lowest_cost = cost
         k += 1
 
-def stoch2(domain, constraints_dict):
+# random stochastic hill climbing
+def rand_stoc_hill_climbing(domain, constraints_dict):
     assignment = init_assignment(domain)
     cost = evaluation_func(assignment, domain, constraints_dict)
     best_assignment, lowest_cost = assignment, cost
     # SET MAX ITERATIONS HERE
-    max_iters = 6905
+    max_iters = 50000
     for i in xrange(max_iters):
         print i
         print "cost", cost
