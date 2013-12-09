@@ -7,7 +7,56 @@ def skill_constraint(assignment, domain, cost):
                 if skill not in workers[worker].skills:
                     total_cost += cost
     return total_cost
-    
+
+def too_many_workers(assignment, domain, cost):
+    workers, tasks = domain
+    total_cost = 0
+    for task in tasks.values():
+        wanted = int(task.num_workers)
+        assigned = 0
+        for worker in workers.keys():
+            for task2 in assignment[worker]:
+                if task == task2:
+                    assigned += 1
+        if assigned > wanted:
+            total_cost += (assigned - wanted) * cost
+    return total_cost
+
+def too_few_workers(assignment, domain, cost):
+    workers, tasks = domain
+    total_cost = 0
+    for task in tasks.values():
+        wanted = int(task.num_workers)
+        assigned = 0
+        for worker in workers.keys():
+            for task2 in assignment[worker]:
+                if task == task2:
+                    assigned += 1
+        if assigned < wanted:
+            total_cost += (wanted - assigned) * cost
+    return total_cost
+
+def too_many_tasks(assignment, domain, cost):
+    workers, tasks = domain
+    total_cost = 0
+    for worker in workers.values():
+        wanted = int(worker.num_tasks)
+        assigned = len(assignment[worker.name])
+        if assigned > wanted:
+            total_cost += (assigned - wanted) * cost
+    return total_cost
+
+def too_few_tasks(assignment, domain, cost):
+    workers, tasks = domain
+    total_cost = 0
+    for worker in workers.values():
+        wanted = int(worker.num_tasks)
+        assigned = len(assignment[worker.name])
+        if assigned < wanted:
+            total_cost += (wanted - assigned) * cost
+    return total_cost
+
+ 
 def all_assigned_constraint(assignment, domain, cost):
     workers, tasks = domain
     total_cost = 0
@@ -25,6 +74,7 @@ def assigned_once_constraint(assignment, domain, cost):
         if assigned_tasks.count(task) > 1:
             total_cost += cost
     return total_cost
+
 
 def efficiency_constraint(assignment, domain, cost):
     workers, tasks = domain
@@ -51,5 +101,4 @@ def time_constraint(assignment, domain, cost):
 
 def labor_cost_constraint(assignment, domain, cost):
     raise("Not Defined")
-    
 
