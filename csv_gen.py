@@ -4,11 +4,11 @@
 import csv
 import names
 import random
+import sys
 
-NUM_WORKERS = 20
+NUM_WORKERS = 30
 NUM_TASKS = 10
 
-# With increasing difficulty
 skillList = ["Make copies", "Make GIFs", "Photoshop", "Write AI code"]
 
 with open("workers.csv", "wb") as workersFile:
@@ -19,19 +19,29 @@ with open("workers.csv", "wb") as workersFile:
 
 	writer.writerow(firstrow)
 
+	total = 0
+
 	for worker in xrange(NUM_WORKERS):
 		row = []
 		name = names.get_full_name()
 		row.append(name)
+		
+		# # each skill has increasing difficulty
+		# for i in xrange(4):
+		# 	if random.random() <= float(1) / (2**i):
+		# 		row.append("T")
+		# 	else:
+		# 		row.append("F")
+		
+		# each worker is randomly assigned skills
 		for i in xrange(4):
-			if random.random() <= float(1) / (2**i):
-				row.append("T")
-			else:
-				row.append("F")
-			#row.append(random.choice(["T","F"]))
-		num_tasks = int(random.random() * NUM_TASKS / 10 + 1)
+			row.append(random.choice(["T","F"]))
+		
+		num_tasks = int(random.random() * NUM_TASKS / 5 + 1)
+		total += num_tasks
 		row.append(num_tasks)
 		writer.writerow(row)
+	print total
 
 with open("tasks.csv", "wb") as tasksFile:
 	writer = csv.writer(tasksFile)
@@ -41,16 +51,32 @@ with open("tasks.csv", "wb") as tasksFile:
 
 	writer.writerow(firstrow)
 
+	total = 0
 	for task in xrange(NUM_TASKS):
 		row = []
 		row.append(task)
-		randnum = random.choice([0,1,2,3])
+
+		# # each skill has increasing rareness
+		# for i in xrange(4):
+		# 	if random.random() <= float(1) / (2**i):
+		# 		row.append("T")
+		# 	else:
+		# 		row.append("F")
+
+		# # each task needs one skill
+		# randnum = random.choice([0,1,2,3])
+		# for i in xrange(4):
+		# 	if i == randnum:
+		# 		row.append("T")
+		# 	else:
+		# 		row.append("F")
+
+		# each task is randomly assigned skills
 		for i in xrange(4):
-			if i == randnum:
-				row.append("T")
-			else:
-				row.append("F")
-			#row.append(random.choice(["T","F"]))
-		num_workers = int(random.random() * NUM_WORKERS / 5 + 1)
+			row.append(random.choice(["T","F"]))
+
+		num_workers = int(random.random() * NUM_WORKERS / 4 + 1)
+		total += num_workers
 		row.append(num_workers)
 		writer.writerow(row)
+	print total
