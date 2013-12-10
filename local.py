@@ -83,7 +83,7 @@ def find_random_neighbor(assignment, domain, constraints_dict):
     return (new_assignment, cost)
 
 # Returns True if no neighbor has a lower cost
-def is_local_maximum(assignment, domain, constraints_dict):
+def is_local_mimimum(assignment, domain, constraints_dict):
     current_cost = evaluation_func(assignment, domain, constraints_dict)
     successors = find_all_neighbors(assignment, domain, constraints_dict)
     for s in successors:
@@ -93,68 +93,71 @@ def is_local_maximum(assignment, domain, constraints_dict):
 
 # LOCAL SEARCHES!!
 
-# hill climbing
 def hill_climbing(domain, constraints_dict):
     assignment = init_assignment(domain)
     best_cost = evaluation_func(assignment, domain, constraints_dict)
     best_neighbor, neighbor_cost = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
-    while(neighbor_cost < best_cost):
+    k = 0
+    while neighbor_cost < best_cost:
         assignment = best_neighbor
         best_cost = neighbor_cost
         best_neighbor, neighbor_cost = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
-        print "cost", best_cost
-    print "FINAL COST", neighbor_cost
+        k += 1
+        print "Iteration: ", k
+        print "Cost: ", best_cost
     return best_neighbor
 
-# random restart hill climbing
+# Random restart hill climbing
 def rr_hill_climbing(domain, constraints_dict):
     # SET MAX ITERATIONS HERE
-    max_iters = 50
+    MAX_ITERS = 5
     best_result = (None, float("inf"))
-    for i in xrange(max_iters):
+    k = 0
+    for i in xrange(MAX_ITERS):
         assignment = init_assignment(domain)
         best_cost = float("inf")
         best_neighbor, neighbor_cost = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
-        while(neighbor_cost < best_cost):
+        while neighbor_cost < best_cost :
             assignment = best_neighbor
             best_cost = neighbor_cost
             best_neighbor, neighbor_cost = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
+            k += 1
+            print "Iteration: ", k
+            print "Cost: ", best_cost
+            print "Lowest cost: ", best_result[1]
         if neighbor_cost < best_result[1]:
             best_result = (best_neighbor, neighbor_cost)
-    print "FINAL COST", best_result[1]
     return best_result[0]
 
-# GLOBALS
-TEMP_FUNCTION = 0 # 0 for exp, 1 for fast, 2 for boltz
-INIT_TEMP = 1000
-MIN_TEMP = 1
-
-# stochastic hill climbing
+# Stochastic hill climbing
 def stoc_hill_climbing(domain, constraints_dict):
-    # SET MAX ITERATIONS HERE
-    max_iters = 50
     assignment = init_assignment(domain)
     curr_cost = evaluation_func(assignment, domain, constraints_dict)
-    for i in xrange(max_iters):
+    k = 0
+    while True:
         neighbors = find_all_neighbors(assignment, domain, constraints_dict)
         diffs = map(lambda x: curr_cost - x[1], neighbors)
         diffs = map(lambda x: 0 if x < 0 else x, diffs)
         diff_sum = float(sum(diffs))
         if diff_sum == 0.0: # local maximum
-            print "FINAL COST", curr_cost
             return assignment
         else:
             probs = map(lambda x: x / diff_sum, diffs)
             idx = list(np.random.multinomial(1, probs, 1)[0]).index(1)
             assignment = neighbors[idx][0]
             curr_cost = neighbors[idx][1]
-        print "cost", curr_cost
-    print "FINAL COST", curr_cost
-    return assignment
+        k += 1
+        print "Iteration: ", k
+        print "Cost: ", curr_cost
+
+# GLOBALS
+TEMP_FUNCTION = 1 # 0 for exp, 1 for fast, 2 for boltz
+INIT_TEMP = 1000
+MIN_TEMP = 1
 
 def temperature(k):
     if TEMP_FUNCTION == 0: # exponential
-        return INIT_TEMP * 0.9995**k
+        return INIT_TEMP * 0.999**k
     elif TEMP_FUNCTION == 1: # fast
         return INIT_TEMP / k
     elif TEMP_FUNCTION == 2: # boltz
@@ -165,14 +168,13 @@ def temperature(k):
 def p_move(new_cost, cost, temp):
     return e**((new_cost-cost)/temp)
 
-# simulated annealing
 def simulated_annealing(domain, constraints_dict):
     assignment = init_assignment(domain)
     cost = evaluation_func(assignment, domain, constraints_dict)
     best_assignment, lowest_cost = assignment, cost
     k = 0
     while True:
-        print k
+        print "Iteration: ", k
         print "Cost: ", cost
         print "Lowest cost: ", lowest_cost
         temp = temperature(k)
@@ -187,17 +189,17 @@ def simulated_annealing(domain, constraints_dict):
                 lowest_cost = cost
         k += 1
 
-# random stochastic hill climbing
+# Similar to simulated annealing, but never moves to a worse point.
 def rand_stoc_hill_climbing(domain, constraints_dict):
     assignment = init_assignment(domain)
     cost = evaluation_func(assignment, domain, constraints_dict)
     best_assignment, lowest_cost = assignment, cost
     # SET MAX ITERATIONS HERE
     max_iters = 50000
-    for i in xrange(max_iters):
-        print i
-        print "cost", cost
-        print "lowest_cost", lowest_cost
+    for k in xrange(max_iters):
+        print "Iteration: ", k
+        print "Cost: ", cost
+        print "Lowest cost", lowest_cost
         rand_neighbor, new_cost = find_random_neighbor(assignment, domain, constraints_dict)
         if new_cost < cost and e**(new_cost-cost) < random.random():
             assignment = rand_neighbor
@@ -236,7 +238,7 @@ def beam_search(domain, constraints_dict, k=3):
         current_k += successors
         current_k = sorted(current_k, key=itemgetter(1))[:k]
         best = current_k[0]
-        print "k:", i
+        print "Iteration: ", i
         print "Best cost:", best[1]
-        if is_local_maximum(best[0], domain, constraints_dict):
+        if is_local_mimimum(best[0], domain, constraints_dict):
             return best[0]
