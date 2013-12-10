@@ -96,6 +96,7 @@ def is_local_mimimum(assignment, domain, constraints_dict):
 # LOCAL SEARCHES!!
 
 def hill_climbing(domain, constraints_dict):
+    line_data = []
     nodes = 0
     assignment = init_assignment(domain)
     best_cost = evaluation_func(assignment, domain, constraints_dict)
@@ -106,12 +107,15 @@ def hill_climbing(domain, constraints_dict):
         assignment = best_neighbor
         best_cost = neighbor_cost
         best_neighbor, neighbor_cost, n = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
+        for i in range(n):
+            line_data.append(best_cost)
         nodes+=n
         k += 1
-    return (best_neighbor, nodes)
+    return (best_neighbor, nodes, line_data)
 
 # Random restart hill climbing
 def rr_hill_climbing(domain, constraints_dict):
+    line_data = []
     nodes = 1
     # SET MAX ITERATIONS HERE
     MAX_ITERS = 5
@@ -126,14 +130,18 @@ def rr_hill_climbing(domain, constraints_dict):
             assignment = best_neighbor
             best_cost = neighbor_cost
             best_neighbor, neighbor_cost, n = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
+            if i == 0:
+                for count in range(n):
+                    line_data.append(best_cost)
             nodes+=n
             k += 1
         if neighbor_cost < best_result[1]:
             best_result = (best_neighbor, neighbor_cost)
-    return (best_result[0], nodes)
+    return (best_result[0], nodes, line_data)
 
 # Stochastic hill climbing
 def stoc_hill_climbing(domain, constraints_dict):
+    line_data= []
     nodes = 1
     assignment = init_assignment(domain)
     curr_cost = evaluation_func(assignment, domain, constraints_dict)
@@ -141,11 +149,13 @@ def stoc_hill_climbing(domain, constraints_dict):
     while True:
         neighbors = find_all_neighbors(assignment, domain, constraints_dict)
         nodes += len(neighbors)
+        for i in range(len(neighbors)):
+            line_data.append(curr_cost)
         diffs = map(lambda x: curr_cost - x[1], neighbors)
         diffs = map(lambda x: 0 if x < 0 else x, diffs)
         diff_sum = float(sum(diffs))
         if diff_sum == 0.0: # local maximum
-            return (assignment, nodes)
+            return (assignment, nodes, line_data)
         else:
             probs = map(lambda x: x / diff_sum, diffs)
             idx = list(np.random.multinomial(1, probs, 1)[0]).index(1)
@@ -172,6 +182,7 @@ def p_move(new_cost, cost, temp):
     return e**((new_cost-cost)/temp)
 
 def simulated_annealing(domain, constraints_dict):
+    line_data = []
     nodes = 1
     assignment = init_assignment(domain)
     cost = evaluation_func(assignment, domain, constraints_dict)
@@ -180,7 +191,7 @@ def simulated_annealing(domain, constraints_dict):
     while True:
         temp = temperature(k)
         if temp < MIN_TEMP:
-            return (best_assignment, nodes)
+            return (best_assignment, nodes, line_data)
         rand_neighbor, new_cost = find_random_neighbor(assignment, domain, constraints_dict)
         nodes += 1
         if new_cost < cost or p_move(new_cost, cost, temp) < random.random():
@@ -189,10 +200,12 @@ def simulated_annealing(domain, constraints_dict):
             if cost < lowest_cost:
                 best_assignment = assignment
                 lowest_cost = cost
+        line_data.append(lowest_cost)
         k += 1
 
 # Similar to simulated annealing, but never moves to a worse point.
 def rand_stoc_hill_climbing(domain, constraints_dict):
+    line_data = []
     nodes = 1
     assignment = init_assignment(domain)
     cost = evaluation_func(assignment, domain, constraints_dict)
@@ -208,22 +221,11 @@ def rand_stoc_hill_climbing(domain, constraints_dict):
             if cost < lowest_cost:
                 best_assignment = assignment 
                 lowest_cost = cost
-    return (best_assignment, nodes)
+        line_data.append(lowest_cost)
+    return (best_assignment, nodes, line_data)
 
-'''
-A cross between Beam Search and Local Search. Normally used to maximize an objective function.
-The algorithm holds 'k' number of states at any given time. Initially these k states are
-randomly generated. The successors of these k states are calculated using the objective function.
-If any of these successors is a 'goal', that is, the maximum value of the objective function,
-then the algorithm halts. Otherwise the initial k states and k number of successors are placed in a pool.
-This pool has a total of 2k states. The pool is numerically sorted and the best (highest) k states
-are selected as new initial states. This process repeats until a maximum value is reached.
-This algorithm is particularity effective at quickly abandoning 'dead end' searches, so maximum
-resources can be used on the promising successors. However when using the Local Beam Searching
-algorithm, the k states can easily become concentrated over a very small amount of state space.
-This leads to the algorithm being nothing more than a more resource intensive Hill Climbing algorithm.
-'''
 def beam_search(domain, constraints_dict, k=3):
+    line_data = []
     nodes = k
     initial_assignments = [init_assignment(domain) for i in range(k)]
     current_k = []
@@ -239,7 +241,10 @@ def beam_search(domain, constraints_dict, k=3):
             for neighbor in neighbors:
                 successors.append(neighbor)
         current_k += successors
-        current_k = sorted(current_k, key=itemgetter(1))[:k]
+        current_k = sorted(current_k, key=itemgetter(1))
+        for i in range(len(current_k)):
+            line_data.append(current_k[0][1])
+        current_k = current_k[:k]
         best = current_k[0]
         if is_local_mimimum(best[0], domain, constraints_dict):
-            return (best[0], nodes)
+            return (best[0], nodes, line_data)
