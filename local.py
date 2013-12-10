@@ -151,17 +151,17 @@ def stoc_hill_climbing(domain, constraints_dict):
         print "Cost: ", curr_cost
 
 # GLOBALS
-TEMP_FUNCTION = 1 # 0 for exp, 1 for fast, 2 for boltz
+TEMP_FUNCTION = 0 # 0 for exp, 1 for fast, 2 for boltz
 INIT_TEMP = 1000
 MIN_TEMP = 1
 
 def temperature(k):
     if TEMP_FUNCTION == 0: # exponential
-        return INIT_TEMP * 0.999**k
+        return INIT_TEMP * 0.9995**k
     elif TEMP_FUNCTION == 1: # fast
-        return INIT_TEMP / k
+        return INIT_TEMP / (k+1)
     elif TEMP_FUNCTION == 2: # boltz
-        return INIT_TEMP / log(k)
+        return INIT_TEMP / log(k+2)
     else:
         raise("Invalid TEMP_FUNCTION")
 

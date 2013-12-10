@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     # constraints_dict
     constraints_dict = {
-        'skill_constraint' : 200,
+        'lack_required_skill' : 200,
         'too_many_workers' : 10,
         'too_few_workers' : 20,
         'too_many_tasks' : 10,

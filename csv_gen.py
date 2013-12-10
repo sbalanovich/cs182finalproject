@@ -5,10 +5,11 @@ import csv
 import names
 import random
 
-NUM_WORKERS = 30
-NUM_TASKS = 10
+NUM_WORKERS = 100
+NUM_TASKS = 20
 
-skillList = ["Computer", "Sorting", "Counting", "Making Coffee"]
+# With increasing difficulty
+skillList = ["Make copies", "Make GIFs", "Photoshop", "Write AI code"]
 
 with open("workers.csv", "wb") as workersFile:
 	writer = csv.writer(workersFile)
@@ -18,12 +19,16 @@ with open("workers.csv", "wb") as workersFile:
 
 	writer.writerow(firstrow)
 
-	for e in xrange(NUM_WORKERS):
+	for worker in xrange(NUM_WORKERS):
 		row = []
 		name = names.get_full_name()
 		row.append(name)
 		for i in xrange(4):
-			row.append(random.choice(["T","F"]))
+			if random.random() <= float(1) / (2**i):
+				row.append("T")
+			else:
+				row.append("F")
+			#row.append(random.choice(["T","F"]))
 		num_tasks = int(random.random() * NUM_TASKS / 10 + 1)
 		row.append(num_tasks)
 		writer.writerow(row)
