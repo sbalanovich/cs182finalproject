@@ -2,10 +2,10 @@
 class Task:
     
     # constructor
-    def __init__(self, name, skill_reqs = [], num_workers=1):
+    def __init__(self, name, skill_reqs = [], wanted_workers=1):
         self.name = name
         self.skill_reqs = skill_reqs
-        self.num_workers = num_workers
+        self.wanted_workers = wanted_workers
 
     # other stuff
     def __str__(self):

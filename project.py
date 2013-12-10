@@ -18,8 +18,8 @@ if __name__ == '__main__':
             for i in xrange(len(skillsTF)):
                 if skillsTF[i] == 'T':
                     skills.append(skillList[i])
-            num_tasks = row[-1]
-            workers[name] = worker.Worker(name, skills = skills, num_tasks = num_tasks)
+            wanted_tasks = row[-1]
+            workers[name] = worker.Worker(name, skills = skills, wanted_tasks = wanted_tasks)
 
     # initialize tasks
     with open("tasks.csv", "rb") as tasksFile:
@@ -33,18 +33,16 @@ if __name__ == '__main__':
             for i in xrange(len(skillsTF)):
                 if skillsTF[i] == 'T':
                     skills.append(skillList[i])
-            num_workers = row[-1]
-            tasks[taskNumber] = task.Task(taskNumber, skill_reqs = skills, num_workers = num_workers)
+            wanted_workers = row[-1]
+            tasks[taskNumber] = task.Task(taskNumber, skill_reqs = skills, wanted_workers = wanted_workers)
 
     # constraints_dict
     constraints_dict = {
-        'skill_constraint' : (True, 200),
-        'too_many_workers' : (True, 10),
-        'too_few_workers' : (True, 20),
-        'too_many_tasks' : (True, 10),
-        'too_few_tasks' : (True, 20)
-        #'all_assigned_constraint' : (True, float("inf")),
-        #'assigned_once_constraint' : (True, 1)
+        'skill_constraint' : 200,
+        'too_many_workers' : 10,
+        'too_few_workers' : 20,
+        'too_many_tasks' : 10,
+        'too_few_tasks' : 20
     }
 
     # get algorithm name argument

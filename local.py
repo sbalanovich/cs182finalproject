@@ -5,81 +5,71 @@ from operator import itemgetter
 from math import log, e
 import numpy as np
 
-# constraints_dict is dict where keys are constraint function names
-# and values are (boolean, int) tuples representing (enabled, cost)
 
+# Find cost of assignment.
 def evaluation_func(assignment, domain, constraints_dict):
     total_cost = 0
-    for key in constraints_dict.keys():
-        enabled, cost = constraints_dict[key]
-        if enabled:
-            total_cost += getattr(constraints, key)(assignment, domain, cost)
+    for name, cost in constraints_dict.iteritems():
+        if cost:
+            constraint_func = getattr(constraints, name)
+            total_cost += constraint_func(assignment, domain, cost)
     return total_cost
 
-# the assignment is represented as a dict where the key is a worker
-# and the value is a list of the tasks assigned to that worker
-
-# initialize a new assignment by making sure every task has at least one worker
-# more specifically, a random number of workers between 1 and len(workers)
-
+# Initialize a new assignment by assigning the wanted number of workers to each task.
 def init_assignment(domain):
     workers, tasks = domain
     assignment = {}
     flipped_asst = {}
-    for task in tasks.values():
-        n = int(task.num_workers)
-        if n > len(workers):
+    for name, task in tasks.iteritems():
+        wanted = int(task.wanted_workers)
+        if wanted > len(workers):
             assignment[task.name] = workers
         else:
-            assignment[task.name] = random.sample(workers, n)
-    for worker in workers.keys():
+            assignment[task.name] = random.sample(workers, wanted)
+    for worker in workers:
         flipped_asst[worker] = []
-    for task in assignment.keys():
+    for task in assignment:
         for worker in assignment[task]:
             flipped_asst[worker].append(task)
     return flipped_asst
 
-# neighbors of the current assignment are generated in one of two ways:
+# Neighbors of the current assignment are generated in one of two ways:
 # either remove one of a worker's assigned tasks or assign the worker a new task
 
+# Returns a list of the (assignment, cost) of all neighbors
 def find_all_neighbors(assignment, domain, constraints_dict):
     workers, tasks = domain
     neighbors = []
-    for worker in assignment.keys():
-        for task in tasks.values():
+    for worker in assignment:
+        for name, task in tasks.iteritems():
             new_assignment = copy.deepcopy(assignment)
-            if task.name in assignment[worker]:
-                new_assignment[worker].remove(task.name)
+            if name in assignment[worker]:
+                new_assignment[worker].remove(name)
                 cost = evaluation_func(new_assignment, domain, constraints_dict)
             else:
-                new_assignment[worker].append(task.name)
+                new_assignment[worker].append(name)
                 cost = evaluation_func(new_assignment, domain, constraints_dict)
             neighbors.append((new_assignment, cost))
     return neighbors
 
-# we evaluate all neighbors of the current assignment
-# and then we return the "best" neighbor (with the lowest cost)
-
+# Return the (assignment, cost) of the neighbor with the lowest cost.
 def find_best_neighbor(assignment, domain, constraints_dict, best_cost):
     workers, tasks = domain
     best_assignment = copy.deepcopy(assignment)
-    for worker in assignment.keys():
-        for task in tasks.values():
+    for worker in assignment:
+        for name, task in tasks.iteritems():
             new_assignment = copy.deepcopy(assignment)
-            if task.name in assignment[worker]:
-                new_assignment[worker].remove(task.name)
+            if name in assignment[worker]:
+                new_assignment[worker].remove(name)
                 cost = evaluation_func(new_assignment, domain, constraints_dict)
             else:
-                new_assignment[worker].append(task.name)
+                new_assignment[worker].append(name)
                 cost = evaluation_func(new_assignment, domain, constraints_dict)
             if cost < best_cost:
-                best_cost = cost
-                best_assignment = new_assignment
+                (best_assignment, best_cost) = new_assignment, cost
     return (best_assignment, best_cost)
     
-# function to choose a random neighbor from the set
-# of all possible neighbors of the current assignment
-
+# Returns the (assignment, cost) of a random neighbor
 def find_random_neighbor(assignment, domain, constraints_dict):
     workers, tasks = domain
     new_assignment = copy.deepcopy(assignment)
@@ -92,18 +82,16 @@ def find_random_neighbor(assignment, domain, constraints_dict):
     cost = evaluation_func(new_assignment, domain, constraints_dict)
     return (new_assignment, cost)
 
+# Returns True if no neighbor has a lower cost
 def is_local_maximum(assignment, domain, constraints_dict):
-    cost = evaluation_func(assignment, domain, constraints_dict)
+    current_cost = evaluation_func(assignment, domain, constraints_dict)
     successors = find_all_neighbors(assignment, domain, constraints_dict)
     for s in successors:
-        if s[1] < cost:
+        if s[1] < current_cost:
             return False
     return True
 
-
-# for hill_climbing, we start with a random assignment generated by init_assignment
-# then we repeatedly move from the current assignment to the best neighbor
-# until we find a local maxima, which we then return as a solution
+# LOCAL SEARCHES!!
 
 # hill climbing
 def hill_climbing(domain, constraints_dict):
