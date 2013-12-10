@@ -1,4 +1,4 @@
-def skill_constraint(assignment, domain, cost):
+def lack_required_skill(assignment, domain, cost):
     workers, tasks = domain
     total_cost = 0
     for worker in assignment.keys():
@@ -12,29 +12,67 @@ def too_many_workers(assignment, domain, cost):
     workers, tasks = domain
     total_cost = 0
     for task in tasks.values():
-        wanted = int(task.num_workers)
+        wanted = int(task.wanted_workers)
         assigned = 0
         for worker in workers.keys():
             for task2 in assignment[worker]:
-                if task == task2:
+                if task.name == task2:
                     assigned += 1
-        total_cost += (assigned - wanted) * cost
+        if assigned > wanted:
+            weight = float((assigned + 1)) / (wanted + 1)
+            total_cost += (assigned - wanted) * cost * weight
     return total_cost
 
 def too_few_workers(assignment, domain, cost):
     workers, tasks = domain
     total_cost = 0
     for task in tasks.values():
-        wanted = int(task.num_workers)
+        wanted = int(task.wanted_workers)
         assigned = 0
         for worker in workers.keys():
             for task2 in assignment[worker]:
-                if task == task2:
+                if task.name == task2:
                     assigned += 1
-        total_cost += (wanted - assigned) * cost
+        if assigned < wanted:
+            weight = float((wanted + 1)) / (assigned + 1)
+            total_cost += (wanted - assigned) * cost * weight
     return total_cost
 
- 
+def too_many_tasks(assignment, domain, cost):
+    workers, tasks = domain
+    total_cost = 0
+    for worker in workers.values():
+        wanted = int(worker.wanted_tasks)
+        assigned = len(assignment[worker.name])
+        if assigned > wanted:
+            weight = float((assigned + 1)) / (wanted + 1)
+            total_cost += (assigned - wanted) * cost * weight
+    return total_cost
+
+def too_few_tasks(assignment, domain, cost):
+    workers, tasks = domain
+    total_cost = 0
+    for worker in workers.values():
+        wanted = int(worker.wanted_tasks)
+        assigned = len(assignment[worker.name])
+        if assigned < wanted:
+            weight = float((wanted + 1)) / (assigned + 1)
+            total_cost += (wanted - assigned) * cost * weight
+    return total_cost
+
+def print_cost_summary(assignment, domain, constraints_dict):
+    skill = lack_required_skill(assignment, domain, constraints_dict['lack_required_skill'])
+    many_workers = too_many_workers(assignment, domain, constraints_dict['too_many_workers'])
+    few_workers = too_few_workers(assignment, domain, constraints_dict['too_few_workers'])
+    many_tasks = too_many_tasks(assignment, domain, constraints_dict['too_many_tasks'])
+    few_tasks = too_few_tasks(assignment, domain, constraints_dict['too_few_tasks'])
+    print "SKILL", skill
+    print "TOO MANY WORKERS", many_workers
+    print "TOO FEW WORKERS", few_workers
+    print "TOO MANY TASKS", many_tasks
+    print "TOO FEW TASKS", few_tasks
+    print "TOTAL: ", skill + many_workers + many_tasks + few_workers + few_tasks
+
 def all_assigned_constraint(assignment, domain, cost):
     workers, tasks = domain
     total_cost = 0
@@ -73,10 +111,4 @@ def preference_constraint(assignment, domain, cost):
             inv_pref = numprefs-workers[worker].prefs[task]
             totalcost += cost*inv_pref
     return total_cost
-
-def time_constraint(assignment, domain, cost):
-    raise("Not Defined")
-
-def labor_cost_constraint(assignment, domain, cost):
-    raise("Not Defined")
 

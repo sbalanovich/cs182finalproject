@@ -1,89 +1,75 @@
 import copy
 import random
 import constraints
+from operator import itemgetter
 from math import log, e
 import numpy as np
 
-# constraints_dict is dict where keys are constraint function names
-# and values are (boolean, int) tuples representing (enabled, cost)
 
+# Find cost of assignment.
 def evaluation_func(assignment, domain, constraints_dict):
     total_cost = 0
-    for key in constraints_dict.keys():
-        enabled, cost = constraints_dict[key]
-        if enabled:
-            total_cost += getattr(constraints, key)(assignment, domain, cost)
+    for name, cost in constraints_dict.iteritems():
+        if cost:
+            constraint_func = getattr(constraints, name)
+            total_cost += constraint_func(assignment, domain, cost)
     return total_cost
 
-# the assignment is represented as a dict where the key is a worker
-# and the value is a list of the tasks assigned to that worker
-
-# initialize a new assignment by making sure every task has at least one worker
-# more specifically, a random number of workers between 1 and len(workers)
-
+# Initialize a new assignment by assigning the wanted number of workers to each task.
 def init_assignment(domain):
     workers, tasks = domain
     assignment = {}
     flipped_asst = {}
-    for task in tasks.values():
-        n = task.num_workers
-        if n > len(workers):
+    for name, task in tasks.iteritems():
+        wanted = int(task.wanted_workers)
+        if wanted > len(workers):
             assignment[task.name] = workers
         else:
-            assignment[task.name] = random.sample(workers, n)
-    for worker in workers.keys():
+            assignment[task.name] = random.sample(workers, wanted)
+    for worker in workers:
         flipped_asst[worker] = []
-    for task in assignment.keys():
+    for task in assignment:
         for worker in assignment[task]:
             flipped_asst[worker].append(task)
     return flipped_asst
 
-# neighbors of the current assignment are generated in one of two ways:
+# Neighbors of the current assignment are generated in one of two ways:
 # either remove one of a worker's assigned tasks or assign the worker a new task
 
+# Returns a list of the (assignment, cost) of all neighbors
 def find_all_neighbors(assignment, domain, constraints_dict):
     workers, tasks = domain
     neighbors = []
-    for worker in assignment.keys():
-        print worker
-        for task in tasks.values():
+    for worker in assignment:
+        for name, task in tasks.iteritems():
             new_assignment = copy.deepcopy(assignment)
-            if task.name in assignment[worker]:
-                new_assignment[worker].remove(task.name)
+            if name in assignment[worker]:
+                new_assignment[worker].remove(name)
                 cost = evaluation_func(new_assignment, domain, constraints_dict)
             else:
-                new_assignment[worker].append(task.name)
+                new_assignment[worker].append(name)
                 cost = evaluation_func(new_assignment, domain, constraints_dict)
             neighbors.append((new_assignment, cost))
     return neighbors
 
-# we evaluate all neighbors of the current assignment
-# and then we return the "best" neighbor (with the lowest cost)
-
+# Return the (assignment, cost) of the neighbor with the lowest cost.
 def find_best_neighbor(assignment, domain, constraints_dict, best_cost):
     workers, tasks = domain
     best_assignment = copy.deepcopy(assignment)
-    for worker in assignment.keys():
-        for task in tasks.values():
+    for worker in assignment:
+        for name, task in tasks.iteritems():
             new_assignment = copy.deepcopy(assignment)
-            if task.name in assignment[worker]:
-                new_assignment[worker].remove(task.name)
+            if name in assignment[worker]:
+                new_assignment[worker].remove(name)
                 cost = evaluation_func(new_assignment, domain, constraints_dict)
             else:
-                new_assignment[worker].append(task.name)
+                new_assignment[worker].append(name)
                 cost = evaluation_func(new_assignment, domain, constraints_dict)
-            #print "Cost:", cost
-            #print "Best Cost:", best_cost
             if cost < best_cost:
-                best_cost = cost
-                best_assignment = new_assignment
-                #print "New assignment with cost", best_cost
-                #print best_assignment
+                (best_assignment, best_cost) = new_assignment, cost
     return (best_assignment, best_cost)
     
-# function to choose a random neighbor from the set
-# of all possible neighbors of the current assignment
-
+# Returns the (assignment, cost) of a random neighbor
 def find_random_neighbor(assignment, domain, constraints_dict):
     workers, tasks = domain
     new_assignment = copy.deepcopy(assignment)
@@ -96,92 +82,101 @@ def find_random_neighbor(assignment, domain, constraints_dict):
     cost = evaluation_func(new_assignment, domain, constraints_dict)
     return (new_assignment, cost)
 
-# for hill_climbing, we start with a random assignment generated by init_assignment
-# then we repeatedly move from the current assignment to the best neighbor
-# until we find a local maxima, which we then return as a solution
+# Returns True if no neighbor has a lower cost
+def is_local_mimimum(assignment, domain, constraints_dict):
+    current_cost = evaluation_func(assignment, domain, constraints_dict)
+    successors = find_all_neighbors(assignment, domain, constraints_dict)
+    for s in successors:
+        if s[1] < current_cost:
+            return False
+    return True
 
-# hill climbing
+# LOCAL SEARCHES!!
+
 def hill_climbing(domain, constraints_dict):
     assignment = init_assignment(domain)
     best_cost = evaluation_func(assignment, domain, constraints_dict)
     best_neighbor, neighbor_cost = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
-    while(neighbor_cost < best_cost):
+    k = 0
+    while neighbor_cost < best_cost:
         assignment = best_neighbor
         best_cost = neighbor_cost
         best_neighbor, neighbor_cost = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
-        print "cost", best_cost
-    print "FINAL COST", neighbor_cost
+        k += 1
+        print "Iteration: ", k
+        print "Cost: ", best_cost
     return best_neighbor
 
-# random restart hill climbing
+# Random restart hill climbing
 def rr_hill_climbing(domain, constraints_dict):
     # SET MAX ITERATIONS HERE
-    max_iters = 50
+    MAX_ITERS = 5
     best_result = (None, float("inf"))
-    for i in xrange(max_iters):
+    k = 0
+    for i in xrange(MAX_ITERS):
         assignment = init_assignment(domain)
         best_cost = float("inf")
         best_neighbor, neighbor_cost = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
-        while(neighbor_cost < best_cost):
+        while neighbor_cost < best_cost :
             assignment = best_neighbor
             best_cost = neighbor_cost
             best_neighbor, neighbor_cost = find_best_neighbor(assignment, domain, constraints_dict, best_cost)
+            k += 1
+            print "Iteration: ", k
+            print "Cost: ", best_cost
+            print "Lowest cost: ", best_result[1]
         if neighbor_cost < best_result[1]:
             best_result = (best_neighbor, neighbor_cost)
-    print "FINAL COST", best_result[1]
     return best_result[0]
 
-# GLOBALS
-TEMP_FUNCTION = 0 # 0 for exp, 1 for fast, 2 for boltz
-INIT_TEMP = 1000
-MIN_TEMP = 1
-
-# stochastic hill climbing
+# Stochastic hill climbing
 def stoc_hill_climbing(domain, constraints_dict):
-    # SET MAX ITERATIONS HERE
-    max_iters = 50
     assignment = init_assignment(domain)
     curr_cost = evaluation_func(assignment, domain, constraints_dict)
-    for i in xrange(max_iters):
+    k = 0
+    while True:
         neighbors = find_all_neighbors(assignment, domain, constraints_dict)
         diffs = map(lambda x: curr_cost - x[1], neighbors)
         diffs = map(lambda x: 0 if x < 0 else x, diffs)
         diff_sum = float(sum(diffs))
         if diff_sum == 0.0: # local maximum
-            print "FINAL COST", curr_cost
             return assignment
         else:
             probs = map(lambda x: x / diff_sum, diffs)
             idx = list(np.random.multinomial(1, probs, 1)[0]).index(1)
             assignment = neighbors[idx][0]
             curr_cost = neighbors[idx][1]
-        print "cost", curr_cost
-    print "FINAL COST", curr_cost
-    return assignment
+        k += 1
+        print "Iteration: ", k
+        print "Cost: ", curr_cost
+
+# GLOBALS
+TEMP_FUNCTION = 0 # 0 for exp, 1 for fast, 2 for boltz
+INIT_TEMP = 1000
+MIN_TEMP = 1
 
 def temperature(k):
     if TEMP_FUNCTION == 0: # exponential
         return INIT_TEMP * 0.9995**k
     elif TEMP_FUNCTION == 1: # fast
-        return INIT_TEMP / k
+        return INIT_TEMP / (k+1)
     elif TEMP_FUNCTION == 2: # boltz
-        return INIT_TEMP / log(k)
+        return INIT_TEMP / log(k+2)
     else:
         raise("Invalid TEMP_FUNCTION")
 
 def p_move(new_cost, cost, temp):
     return e**((new_cost-cost)/temp)
 
-# simulated annealing
 def simulated_annealing(domain, constraints_dict):
     assignment = init_assignment(domain)
     cost = evaluation_func(assignment, domain, constraints_dict)
     best_assignment, lowest_cost = assignment, cost
     k = 0
     while True:
-        print k
-        print "cost", cost
-        print "lowest_cost", lowest_cost
+        print "Iteration: ", k
+        print "Cost: ", cost
+        print "Lowest cost: ", lowest_cost
         temp = temperature(k)
         if temp < MIN_TEMP:
             return best_assignment
@@ -194,16 +189,17 @@ def simulated_annealing(domain, constraints_dict):
                 lowest_cost = cost
         k += 1
 
-def rand_stoch_hill_climbing(domain, constraints_dict):
+# Similar to simulated annealing, but never moves to a worse point.
+def rand_stoc_hill_climbing(domain, constraints_dict):
     assignment = init_assignment(domain)
     cost = evaluation_func(assignment, domain, constraints_dict)
     best_assignment, lowest_cost = assignment, cost
     # SET MAX ITERATIONS HERE
-    max_iters = 30000
-    for i in xrange(max_iters):
-        print i
-        print "cost", cost
-        print "lowest_cost", lowest_cost
+    max_iters = 50000
+    for k in xrange(max_iters):
+        print "Iteration: ", k
+        print "Cost: ", cost
+        print "Lowest cost", lowest_cost
         rand_neighbor, new_cost = find_random_neighbor(assignment, domain, constraints_dict)
         if new_cost < cost and e**(new_cost-cost) < random.random():
             assignment = rand_neighbor
@@ -212,6 +208,7 @@ def rand_stoch_hill_climbing(domain, constraints_dict):
                 best_assignment = assignment 
                 lowest_cost = cost
     return best_assignment
+
 '''
 A cross between Beam Search and Local Search. Normally used to maximize an objective function.
 The algorithm holds 'k' number of states at any given time. Initially these k states are
@@ -225,27 +222,23 @@ resources can be used on the promising successors. However when using the Local 
 algorithm, the k states can easily become concentrated over a very small amount of state space.
 This leads to the algorithm being nothing more than a more resource intensive Hill Climbing algorithm.
 '''
-def beam_search(domain, constraints_dict, k=10):
+def beam_search(domain, constraints_dict, k=3):
     initial_assignments = [init_assignment(domain) for i in range(k)]
-    min_k = initial_assignments
-    successors = []
-    scores = []
+    current_k = []
+    for a in initial_assignments:
+        cost = evaluation_func(a, domain, constraints_dict)
+        current_k.append((a, cost))
     max_iters = 30000
     for i in xrange(max_iters):
-        for asst in min_k:
-            neighbors = find_all_neighbors(asst, domain, constraints_dict)
-            print neighbors
-            successors.append(neighbors)
-        successors = [item for sublist in successors for item in sublist]
-        for asst in (successors + initial_assignments):
-            score = evaluation_func(asst, domain, constraints_dict)
-            if score == 0:
-                return asst
-            scores.append(score, asst)
-        min_k = scores.sort()[k:]
-        print min_k
-    
-        
-        
-    
-    
+        successors = []
+        for asst in current_k:
+            neighbors = find_all_neighbors(asst[0], domain, constraints_dict)
+            for neighbor in neighbors:
+                successors.append(neighbor)
+        current_k += successors
+        current_k = sorted(current_k, key=itemgetter(1))[:k]
+        best = current_k[0]
+        print "Iteration: ", i
+        print "Best cost:", best[1]
+        if is_local_mimimum(best[0], domain, constraints_dict):
+            return best[0]

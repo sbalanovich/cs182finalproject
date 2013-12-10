@@ -8,21 +8,29 @@ import random
 NUM_WORKERS = 100
 NUM_TASKS = 20
 
-skillList = ["Computer", "Sorting", "Counting", "Making Coffee"]
+# With increasing difficulty
+skillList = ["Make copies", "Make GIFs", "Photoshop", "Write AI code"]
 
 with open("workers.csv", "wb") as workersFile:
 	writer = csv.writer(workersFile)
 	firstrow = ["Name"]
 	firstrow.extend(skillList)
+	firstrow.append("Number of tasks")
 
 	writer.writerow(firstrow)
 
-	for e in xrange(NUM_WORKERS):
+	for worker in xrange(NUM_WORKERS):
 		row = []
 		name = names.get_full_name()
 		row.append(name)
 		for i in xrange(4):
-			row.append(random.choice(["T","F"]))
+			if random.random() <= float(1) / (2**i):
+				row.append("T")
+			else:
+				row.append("F")
+			#row.append(random.choice(["T","F"]))
+		num_tasks = int(random.random() * NUM_TASKS / 10 + 1)
+		row.append(num_tasks)
 		writer.writerow(row)
 
 with open("tasks.csv", "wb") as tasksFile:
@@ -36,8 +44,13 @@ with open("tasks.csv", "wb") as tasksFile:
 	for task in xrange(NUM_TASKS):
 		row = []
 		row.append(task)
+		randnum = random.choice([0,1,2,3])
 		for i in xrange(4):
-			row.append(random.choice(["T","F"]))
-		num_workers = int(random.random() * NUM_WORKERS / 10 + 1)
+			if i == randnum:
+				row.append("T")
+			else:
+				row.append("F")
+			#row.append(random.choice(["T","F"]))
+		num_workers = int(random.random() * NUM_WORKERS / 5 + 1)
 		row.append(num_workers)
 		writer.writerow(row)

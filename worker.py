@@ -2,11 +2,12 @@
 class Worker:
     
     # constructor
-    def __init__(self, name, skills = [], effs = {}, prefs = {}):
+    def __init__(self, name, skills = [], effs = {}, prefs = {}, wanted_tasks = 0):
         self.name = name
         self.skills = skills
         self.effs = effs
         self.prefs = prefs
+        self.wanted_tasks = wanted_tasks
 
     # other stuff
     def __str__(self):
