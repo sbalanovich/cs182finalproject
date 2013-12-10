@@ -1,6 +1,7 @@
 import copy
 import random
 import constraints
+from operator import itemgetter
 from math import log, e
 import numpy as np
 
@@ -26,7 +27,7 @@ def init_assignment(domain):
     assignment = {}
     flipped_asst = {}
     for task in tasks.values():
-        n = task.num_workers
+        n = int(task.num_workers)
         if n > len(workers):
             assignment[task.name] = workers
         else:
@@ -231,24 +232,23 @@ resources can be used on the promising successors. However when using the Local 
 algorithm, the k states can easily become concentrated over a very small amount of state space.
 This leads to the algorithm being nothing more than a more resource intensive Hill Climbing algorithm.
 '''
-def beam_search(domain, constraints_dict, k=10):
+def beam_search(domain, constraints_dict, k=3):
     initial_assignments = [init_assignment(domain) for i in range(k)]
-    min_k = initial_assignments
-    successors = []
-    scores = []
+    current_k = []
+    for a in initial_assignments:
+        cost = evaluation_func(a, domain, constraints_dict)
+        current_k.append((a, cost))
     max_iters = 30000
     for i in xrange(max_iters):
-        for asst in min_k:
-            neighbors = find_all_neighbors(asst, domain, constraints_dict)
+        successors = []
+        for asst in current_k:
+            neighbors = find_all_neighbors(asst[0], domain, constraints_dict)
             for neighbor in neighbors:
-                successors.append(neighbor[0])
-        for asst in (successors + initial_assignments):
-            score = evaluation_func(asst, domain, constraints_dict)
-            scores.append((score, asst))
-        scores.sort()
-        best = scores[0][1]
-        print i
-        print "Best cost: ", scores[0][0]
-        if is_local_maximum(best, domain, constraints_dict):
-            return best
-        min_k = [s[1] for s in scores[:k]]
+                successors.append(neighbor)
+        current_k += successors
+        current_k = sorted(current_k, key=itemgetter(1))[:k]
+        best = current_k[0]
+        print "k:", i
+        print "Best cost:", best[1]
+        if is_local_maximum(best[0], domain, constraints_dict):
+            return best[0]

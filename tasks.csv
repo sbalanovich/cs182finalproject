@@ -1,5 +1,11 @@
 Task,Computer,Sorting,Counting,Making Coffee,Number of workers
-0,F,F,T,T,1
-1,F,F,F,F,1
-2,T,F,F,T,2
-3,T,F,F,T,2
+0,F,F,T,F,4
+1,T,F,F,F,2
+2,F,F,F,T,6
+3,T,F,F,F,4
+4,F,T,F,F,6
+5,T,F,F,F,6
+6,F,T,F,F,4
+7,F,T,F,F,4
+8,F,F,T,F,6
+9,F,F,T,F,2

@@ -16,10 +16,11 @@ def too_many_workers(assignment, domain, cost):
         assigned = 0
         for worker in workers.keys():
             for task2 in assignment[worker]:
-                if task == task2:
+                if task.name == task2:
                     assigned += 1
         if assigned > wanted:
-            total_cost += (assigned - wanted) * cost
+            weight = float((assigned + 1)) / (wanted + 1)
+            total_cost += (assigned - wanted) * cost * weight
     return total_cost
 
 def too_few_workers(assignment, domain, cost):
@@ -30,10 +31,11 @@ def too_few_workers(assignment, domain, cost):
         assigned = 0
         for worker in workers.keys():
             for task2 in assignment[worker]:
-                if task == task2:
+                if task.name == task2:
                     assigned += 1
         if assigned < wanted:
-            total_cost += (wanted - assigned) * cost
+            weight = float((wanted + 1)) / (assigned + 1)
+            total_cost += (wanted - assigned) * cost * weight
     return total_cost
 
 def too_many_tasks(assignment, domain, cost):
@@ -43,7 +45,8 @@ def too_many_tasks(assignment, domain, cost):
         wanted = int(worker.num_tasks)
         assigned = len(assignment[worker.name])
         if assigned > wanted:
-            total_cost += (assigned - wanted) * cost
+            weight = float((assigned + 1)) / (wanted + 1)
+            total_cost += (assigned - wanted) * cost * weight
     return total_cost
 
 def too_few_tasks(assignment, domain, cost):
@@ -53,10 +56,17 @@ def too_few_tasks(assignment, domain, cost):
         wanted = int(worker.num_tasks)
         assigned = len(assignment[worker.name])
         if assigned < wanted:
-            total_cost += (wanted - assigned) * cost
+            weight = float((wanted + 1)) / (assigned + 1)
+            total_cost += (wanted - assigned) * cost * weight
     return total_cost
 
- 
+def print_cost_summary(assignment, domain, constraints_dict):
+    print "SKILL", skill_constraint(assignment, domain, constraints_dict['skill_constraint'][1])
+    print "TOO MANY WORKERS", too_many_workers(assignment, domain, constraints_dict['too_many_workers'][1])
+    print "TOO FEW WORKERS", too_few_workers(assignment, domain, constraints_dict['too_few_workers'][1])
+    print "TOO MANY TASKS", too_many_tasks(assignment, domain, constraints_dict['too_many_tasks'][1])
+    print "TOO FEW TASKS", too_few_tasks(assignment, domain, constraints_dict['too_few_tasks'][1])
+
 def all_assigned_constraint(assignment, domain, cost):
     workers, tasks = domain
     total_cost = 0

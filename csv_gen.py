@@ -5,8 +5,8 @@ import csv
 import names
 import random
 
-NUM_WORKERS = 10
-NUM_TASKS = 4
+NUM_WORKERS = 30
+NUM_TASKS = 10
 
 skillList = ["Computer", "Sorting", "Counting", "Making Coffee"]
 
@@ -39,8 +39,13 @@ with open("tasks.csv", "wb") as tasksFile:
 	for task in xrange(NUM_TASKS):
 		row = []
 		row.append(task)
+		randnum = random.choice([0,1,2,3])
 		for i in xrange(4):
-			row.append(random.choice(["T","F"]))
+			if i == randnum:
+				row.append("T")
+			else:
+				row.append("F")
+			#row.append(random.choice(["T","F"]))
 		num_workers = int(random.random() * NUM_WORKERS / 5 + 1)
 		row.append(num_workers)
 		writer.writerow(row)

@@ -3,6 +3,7 @@ import worker
 import task
 import local
 import csv
+from constraints import print_cost_summary
 
 if __name__ == '__main__':
     # initialize workers
@@ -37,11 +38,11 @@ if __name__ == '__main__':
 
     # constraints_dict
     constraints_dict = {
-        'skill_constraint' : (True, 10),
-        'too_many_workers' : (True, 5),
+        'skill_constraint' : (True, 200),
+        'too_many_workers' : (True, 10),
         'too_few_workers' : (True, 20),
-        'too_many_tasks' : (True, 20),
-        'too_few_tasks' : (True, 5)
+        'too_many_tasks' : (True, 10),
+        'too_few_tasks' : (True, 20)
         #'all_assigned_constraint' : (True, float("inf")),
         #'assigned_once_constraint' : (True, 1)
     }
@@ -50,3 +51,4 @@ if __name__ == '__main__':
     algo = sys.argv[1]
     solution = getattr(local, algo)((workers, tasks), constraints_dict)
     print solution
+    print_cost_summary(solution, (workers, tasks), constraints_dict)
