@@ -1,0 +1,21 @@
+Task,Make copies,Make GIFs,Photoshop,Write AI code,Number of workers
+0,T,F,F,F,7
+1,F,F,F,T,12
+2,F,F,T,F,13
+3,F,F,F,T,8
+4,T,F,F,F,1
+5,F,F,F,T,9
+6,F,T,F,F,8
+7,F,T,F,F,10
+8,F,T,F,F,4
+9,T,F,F,F,5
+10,T,F,F,F,13
+11,F,F,T,F,12
+12,F,T,F,F,8
+13,F,F,T,F,4
+14,F,T,F,F,8
+15,F,T,F,F,5
+16,F,F,F,T,1
+17,F,F,F,T,11
+18,T,F,F,F,15
+19,F,T,F,F,8
