@@ -5,8 +5,8 @@ import csv
 import names
 import random
 
-NUM_WORKERS = 100
-NUM_TASKS = 20
+NUM_WORKERS = 20
+NUM_TASKS = 10
 
 # With increasing difficulty
 skillList = ["Make copies", "Make GIFs", "Photoshop", "Write AI code"]
