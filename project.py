@@ -7,7 +7,7 @@ from constraints import print_cost_summary
 
 if __name__ == '__main__':
     # initialize workers
-    with open("workers.csv", "rb") as workersFile:
+    with open("csv/small/worker_skill_increasing_difficulty/task_skill_increasing_rareness/workers.csv", "rb") as workersFile:
         reader = csv.reader(workersFile)
         skillList = next(reader, None)[1:-1]
         workers = {}
@@ -22,7 +22,7 @@ if __name__ == '__main__':
             workers[name] = worker.Worker(name, skills = skills, wanted_tasks = wanted_tasks)
 
     # initialize tasks
-    with open("tasks.csv", "rb") as tasksFile:
+    with open("csv/small/worker_skill_increasing_difficulty/task_skill_increasing_rareness/tasks.csv", "rb") as tasksFile:
         reader = csv.reader(tasksFile)
         skillList = next(reader, None)[1:-1]
         tasks = {}
