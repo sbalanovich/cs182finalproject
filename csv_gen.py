@@ -26,14 +26,16 @@ with open("workers.csv", "wb") as workersFile:
 		name = names.get_full_name()
 		row.append(name)
 		
-		# # each skill has increasing difficulty
+		# CHOOSE BETWEEN THE TWO
+
+		# # (1) each skill has increasing difficulty
 		# for i in xrange(4):
 		# 	if random.random() <= float(1) / (2**i):
 		# 		row.append("T")
 		# 	else:
 		# 		row.append("F")
 		
-		# each worker is randomly assigned skills
+		# (2) each worker is randomly assigned skills
 		for i in xrange(4):
 			row.append(random.choice(["T","F"]))
 		
@@ -56,14 +58,16 @@ with open("tasks.csv", "wb") as tasksFile:
 		row = []
 		row.append(task)
 
-		# # each skill has increasing rareness
+		# CHOOSE AMONG THE THREE
+
+		# # (1) each skill has increasing rareness
 		# for i in xrange(4):
 		# 	if random.random() <= float(1) / (2**i):
 		# 		row.append("T")
 		# 	else:
 		# 		row.append("F")
 
-		# # each task needs one skill
+		# # (2) each task needs one skill
 		# randnum = random.choice([0,1,2,3])
 		# for i in xrange(4):
 		# 	if i == randnum:
@@ -71,7 +75,7 @@ with open("tasks.csv", "wb") as tasksFile:
 		# 	else:
 		# 		row.append("F")
 
-		# each task is randomly assigned skills
+		# (3) each task is randomly assigned skills
 		for i in xrange(4):
 			row.append(random.choice(["T","F"]))
 
